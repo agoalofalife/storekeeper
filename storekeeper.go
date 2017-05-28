@@ -2,8 +2,8 @@ package storekeeper
 
 import (
 	//"errors"
-	"log"
-	"os"
+	//"log"
+	//"os"
 	"reflect"
 )
 
@@ -34,15 +34,16 @@ func (store *Store) Extract(abstract interface{}) interface{} {
 		// TODO here it is necessary to determine two things : what is type (ptr... example), what first argument
 		// TODO it is Store struct
 		values, _ := store.call(store.binding, `name`, store)
-		log.Println(`values`, values)
-		os.Exit(2)
+		instance := values[0].Interface()
+
+		store.SetInstance(abstract, instance)
+		return instance
 	}
 	return nil
 }
-
+// bind some structure
 func (store *Store) Bind(abstract interface{}, concrete interface{}) *Store {
 	store.binding[abstract] = concrete
-
 	return store
 }
 
@@ -50,10 +51,6 @@ func (store *Store) Bind(abstract interface{}, concrete interface{}) *Store {
 func (store *Store) call(m map[interface{}]interface{}, name string, params ...interface{}) (result []reflect.Value, err error) {
 	f := reflect.ValueOf(m[name])
 	countArg := store.countArgumentsClosure(f)
-	//if len(params) != f.Type().NumIn() {
-	//	err = errors.New("The number of params is not adapted.")
-	//	return
-	//}
 
 	in := make([]reflect.Value, countArg)
 	if countArg > 0 {
@@ -63,9 +60,6 @@ func (store *Store) call(m map[interface{}]interface{}, name string, params ...i
 	}
 
 	result = f.Call(in)
-	// TODO need to come up with how return only first index which us need
-	log.Println(result, `result`)
-	os.Exit(2)
 	return
 }
 
