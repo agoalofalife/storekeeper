@@ -31,8 +31,8 @@ func (store *store) Extract(abstract interface{}) interface{} {
 		return instance
 	}
 	if _, exist := store.binding[abstract]; exist {
-		values, _ := store.call(store.binding, `name`)
-		log.Println(values[0])
+		values, _ := store.call(store.binding, `name`, store)
+		log.Println(`values`, values)
 		os.Exit(2)
 	}
 	return nil
@@ -40,6 +40,7 @@ func (store *store) Extract(abstract interface{}) interface{} {
 
 func (store *store) Bind(abstract interface{}, concrete interface{}) *store {
 	store.binding[abstract] = concrete
+
 	return store
 }
 
@@ -50,10 +51,14 @@ func (store *store) call(m map[interface{}]interface{}, name string, params ...i
 		err = errors.New("The number of params is not adapted.")
 		return
 	}
+
 	in := make([]reflect.Value, len(params))
 	for k, param := range params {
 		in[k] = reflect.ValueOf(param)
 	}
+
 	result = f.Call(in)
+	log.Println(result, `result`)
+	os.Exit(2)
 	return
 }
