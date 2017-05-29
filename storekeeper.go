@@ -33,7 +33,7 @@ func (store *Store) Extract(abstract interface{}) interface{} {
 	if _, exist := store.binding[abstract]; exist {
 		// TODO here it is necessary to determine two things : what is type (ptr... example), what first argument
 		// TODO it is Store struct
-		values, _ := store.call(store.binding, `name`, store)
+		values, _ := store.call(store.binding, abstract.(string), store)
 		instance := values[0].Interface()
 
 		store.SetInstance(abstract, instance)
@@ -41,6 +41,7 @@ func (store *Store) Extract(abstract interface{}) interface{} {
 	}
 	return nil
 }
+
 // bind some structure
 func (store *Store) Bind(abstract interface{}, concrete interface{}) *Store {
 	store.binding[abstract] = concrete
