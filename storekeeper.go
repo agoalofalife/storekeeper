@@ -7,6 +7,12 @@ import (
 	"reflect"
 )
 
+// list possible errors in current application
+const (
+	ERROR_NOT_SPECIFIED_STRUCT_IN_BIND = `expected struct in first parameter`
+	ERROR_NOT_SPECIFIED_METHOD_IN_BIND = `the method is not a string and not found in the structure`
+)
+
 type Store struct {
 	instance map[interface{}]interface{}
 	binding  map[interface{}]interface{}
@@ -42,8 +48,6 @@ func (store *Store) Extract(abstract interface{}) interface{} {
 			store.SetInstance(abstract, instance)
 			return instance
 		case `slice`:
-			log.Println(bind.([]interface{}))
-			os.Exit(2)
 			store.verifySliceBind(bind.([]interface{}))
 			log.Println(bind)
 			os.Exit(2)
@@ -85,7 +89,12 @@ func (store *Store) countArgumentsClosure(function reflect.Value) int {
 // first parameter this is structure
 // second method or so string
 func (store *Store) verifySliceBind(slice []interface{}) {
-	//log.Println(reflect.TypeOf(slice))
-	//log.Println(reflect.TypeOf(slice))
-	os.Exit(2)
+	if reflect.TypeOf(slice[0]).Kind().String() != `struct` {
+		panic(ERROR_NOT_SPECIFIED_STRUCT_IN_BIND)
+	}
+	_,existMethod := reflect.TypeOf(slice[0]).MethodByName(slice[1].(string))
+
+	if reflect.TypeOf(slice[1]).Kind().String() != `string`|| existMethod == false{
+		panic(ERROR_NOT_SPECIFIED_METHOD_IN_BIND)
+	}
 }
