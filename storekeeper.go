@@ -2,8 +2,8 @@ package storekeeper
 
 import (
 	//"errors"
-	//"log"
-	//"os"
+	"log"
+	"os"
 	"reflect"
 )
 
@@ -30,14 +30,26 @@ func (store *Store) Extract(abstract interface{}) interface{} {
 	if instance, exist := store.instance[abstract]; exist {
 		return instance
 	}
-	if _, exist := store.binding[abstract]; exist {
+	if bind, exist := store.binding[abstract]; exist {
 		// TODO here it is necessary to determine two things : what is type (ptr... example), what first argument
 		// TODO it is Store struct
-		values, _ := store.call(store.binding, abstract.(string), store)
-		instance := values[0].Interface()
+		//log.Println(reflect.TypeOf(bind).Kind().String())
+		//os.Exit(2)
+		switch reflect.TypeOf(bind).Kind().String() {
+		case `func`:
+			values, _ := store.call(store.binding, abstract.(string), store)
+			instance := values[0].Interface()
+			store.SetInstance(abstract, instance)
+			return instance
+		case `slice`:
+			log.Println(bind.([]interface{}))
+			os.Exit(2)
+			store.verifySliceBind(bind.([]interface{}))
+			log.Println(bind)
+			os.Exit(2)
 
-		store.SetInstance(abstract, instance)
-		return instance
+		}
+
 	}
 	return nil
 }
@@ -67,4 +79,13 @@ func (store *Store) call(m map[interface{}]interface{}, name string, params ...i
 // get count arguments in value, mean function (closure)
 func (store *Store) countArgumentsClosure(function reflect.Value) int {
 	return function.Type().NumIn()
+}
+
+// get slice check what :
+// first parameter this is structure
+// second method or so string
+func (store *Store) verifySliceBind(slice []interface{}) {
+	//log.Println(reflect.TypeOf(slice))
+	//log.Println(reflect.TypeOf(slice))
+	os.Exit(2)
 }
