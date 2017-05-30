@@ -39,8 +39,7 @@ func (store *Store) Extract(abstract interface{}) interface{} {
 	if bind, exist := store.binding[abstract]; exist {
 		// TODO here it is necessary to determine two things : what is type (ptr... example), what first argument
 		// TODO it is Store struct
-		//log.Println(reflect.TypeOf(bind).Kind().String())
-		//os.Exit(2)
+
 		switch reflect.TypeOf(bind).Kind().String() {
 		case `func`:
 			values, _ := store.call(store.binding, abstract.(string), store)
@@ -49,9 +48,8 @@ func (store *Store) Extract(abstract interface{}) interface{} {
 			return instance
 		case `slice`:
 			store.verifySliceBind(bind.([]interface{}))
-			log.Println(bind)
+			log.Println(store.callFS(bind.([]interface{})[0], bind.([]interface{})[1].(string)))
 			os.Exit(2)
-
 		}
 
 	}
@@ -62,6 +60,15 @@ func (store *Store) Extract(abstract interface{}) interface{} {
 func (store *Store) Bind(abstract interface{}, concrete interface{}) *Store {
 	store.binding[abstract] = concrete
 	return store
+}
+
+// call from structure
+func (store *Store) callFS(any interface{}, name string, args ...interface{}) []reflect.Value {
+	inputs := make([]reflect.Value, len(args))
+	for i, _ := range args {
+		inputs[i] = reflect.ValueOf(args[i])
+	}
+	return reflect.ValueOf(any).MethodByName(name).Call(inputs)
 }
 
 // function call closure and return ready structure
@@ -92,9 +99,9 @@ func (store *Store) verifySliceBind(slice []interface{}) {
 	if reflect.TypeOf(slice[0]).Kind().String() != `struct` {
 		panic(ERROR_NOT_SPECIFIED_STRUCT_IN_BIND)
 	}
-	_,existMethod := reflect.TypeOf(slice[0]).MethodByName(slice[1].(string))
+	_, existMethod := reflect.TypeOf(slice[0]).MethodByName(slice[1].(string))
 
-	if reflect.TypeOf(slice[1]).Kind().String() != `string`|| existMethod == false{
+	if reflect.TypeOf(slice[1]).Kind().String() != `string` || existMethod == false {
 		panic(ERROR_NOT_SPECIFIED_METHOD_IN_BIND)
 	}
 }
