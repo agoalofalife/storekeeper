@@ -1,7 +1,7 @@
 package storekeeper
 
 import (
-	//"errors"
+	"github.com/olekukonko/tablewriter"
 	"log"
 	"os"
 	"reflect"
@@ -48,10 +48,13 @@ func (store *Store) Extract(abstract interface{}) interface{} {
 			return instance
 		case `slice`:
 			store.verifySliceBind(bind.([]interface{}))
-			log.Println(store.callFS(bind.([]interface{})[0], bind.([]interface{})[1].(string)))
-			os.Exit(2)
+			instance := bind.([]interface{})[0]
+			store.callFS(instance, bind.([]interface{})[1].(string))
+			store.SetInstance(abstract, instance)
+			return instance
 		}
-
+		log.Println()
+		os.Exit(2)
 	}
 	return nil
 }
@@ -96,12 +99,45 @@ func (store *Store) countArgumentsClosure(function reflect.Value) int {
 // first parameter this is structure
 // second method or so string
 func (store *Store) verifySliceBind(slice []interface{}) {
-	if reflect.TypeOf(slice[0]).Kind().String() != `struct` {
+	firstArg := reflect.TypeOf(slice[0]).Kind().String()
+
+	if firstArg != `struct` && firstArg != `ptr` {
 		panic(ERROR_NOT_SPECIFIED_STRUCT_IN_BIND)
 	}
+
 	_, existMethod := reflect.TypeOf(slice[0]).MethodByName(slice[1].(string))
 
 	if reflect.TypeOf(slice[1]).Kind().String() != `string` || existMethod == false {
 		panic(ERROR_NOT_SPECIFIED_METHOD_IN_BIND)
 	}
+}
+
+// --- INFO
+func (store *Store) getStructTag(f reflect.StructField) string {
+	return string(f.Name)
+}
+func (store *Store) State() bool {
+	//types := []string{`instance`, `binding`}
+	field, _ := reflect.TypeOf(store).Elem().FieldByName(`instance`)
+	log.Println(store.getStructTag(field))
+	os.Exit(2)
+	data := [][]string{
+		[]string{"A", "The Good", "500"},
+		[]string{"B", "The Very very Bad Man", "288"},
+		[]string{"C", "The Ugly", "120"},
+		[]string{"D", "The Gopher", "800"},
+	}
+	data = [][]string{}
+
+	for v, _ := range store.instance {
+		log.Println(v.(string), `logger`)
+		os.Exit(2)
+	}
+
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"Type", "Key", "Value"})
+	table.SetBorder(true)  // Set Border to false
+	table.AppendBulk(data) // Add Bulk Data
+	table.Render()
+	return true
 }
