@@ -116,10 +116,12 @@ func (store *Store) verifySliceBind(slice []interface{}) {
 func (store *Store) getStructTag(f reflect.StructField) string {
 	return string(f.Name)
 }
-func (store *Store) State() bool {
+func (store Store) State() bool {
 	//types := []string{`instance`, `binding`}
-	field, _ := reflect.TypeOf(store).Elem().FieldByName(`instance`)
-	log.Println(store.getStructTag(field))
+	//field, _ := reflect.TypeOf(store).Elem().FieldByName(`instance`)
+	//log.Println(store.getStructTag(field))
+	d := reflect.ValueOf(store)
+	log.Println(d.FieldByName("instance"))
 	os.Exit(2)
 	data := [][]string{
 		[]string{"A", "The Good", "500"},
