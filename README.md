@@ -13,14 +13,13 @@
 
 
 
-
 <a name="Fast_Example"></a>
 ## Installation
 
     go get github.com/agoalofalife/storekeeper
     
 <a name="Example_fast"></a>
-## Fast_Example
+## Fast Example
 
 When we need to put structure and method constructor
     
@@ -29,17 +28,21 @@ When we need to put structure and method constructor
     store "github.com/agoalofalife/storekeeper"
 	      "fmt"
     )
+    
        type People struct {
     	name string
     	Address string
     }
+    
     // this is any constructor for People
     func (people *People) Constructor(){
     	people.name = name{}
     	people.Address = `Some Street some House ...`
     }
+    
     // always initialize first
     storage := store.New()
+    
     // Method Bind get first argument any type (preferably string)
     
     // Two argumetn slice where first it is struct and second method constructor
@@ -51,6 +54,7 @@ When we need to put structure and method constructor
     // p and has initialized struct and run method Constructor 
     // &{{} Some Street some House ...}
     // for further use it is necessary to give type
+    
     p.(*People)
     // ! please note when handling the type depend of pointer or not
 
