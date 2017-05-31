@@ -113,9 +113,6 @@ func (store *Store) verifySliceBind(slice []interface{}) {
 }
 
 // --- INFO
-func (store *Store) getStructTag(f reflect.StructField) string {
-	return string(f.Name)
-}
 
 // a report on the state of the repository at the moment
 func (store Store) State() bool {
