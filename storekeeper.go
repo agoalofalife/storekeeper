@@ -117,10 +117,19 @@ func (store *Store) getStructTag(f reflect.StructField) string {
 	return string(f.Name)
 }
 func (store Store) State() bool {
-	//types := []string{`instance`, `binding`}
+	types := []string{`instance`, `binding`}
 	//field, _ := reflect.TypeOf(store).Elem().FieldByName(`instance`)
 	//log.Println(store.getStructTag(field))
 	d := reflect.ValueOf(store)
+	for _, typ := range types {
+		log.Println( d.FieldByName(typ))
+		os.Exit(2)
+		//for abstract, value := range d.FieldByName(typ) {
+		//	log.Println(abstract, value)
+		//	os.Exit(2)
+		//}
+
+	}
 	log.Println(d.FieldByName("instance"))
 	os.Exit(2)
 	data := [][]string{
