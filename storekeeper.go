@@ -116,33 +116,18 @@ func (store *Store) verifySliceBind(slice []interface{}) {
 func (store *Store) getStructTag(f reflect.StructField) string {
 	return string(f.Name)
 }
+
+// a report on the state of the repository at the moment
 func (store Store) State() bool {
 	types := []string{`instance`, `binding`}
-	//field, _ := reflect.TypeOf(store).Elem().FieldByName(`instance`)
-	//log.Println(store.getStructTag(field))
+	data := [][]string{}
+
 	d := reflect.ValueOf(store)
 	for _, typ := range types {
-		log.Println( d.FieldByName(typ))
-		os.Exit(2)
-		//for abstract, value := range d.FieldByName(typ) {
-		//	log.Println(abstract, value)
-		//	os.Exit(2)
-		//}
-
-	}
-	log.Println(d.FieldByName("instance"))
-	os.Exit(2)
-	data := [][]string{
-		[]string{"A", "The Good", "500"},
-		[]string{"B", "The Very very Bad Man", "288"},
-		[]string{"C", "The Ugly", "120"},
-		[]string{"D", "The Gopher", "800"},
-	}
-	data = [][]string{}
-
-	for v, _ := range store.instance {
-		log.Println(v.(string), `logger`)
-		os.Exit(2)
+		for _, abstract := range d.FieldByName(typ).MapKeys() {
+			concrete := d.FieldByName(typ).MapIndex(abstract).Elem().Type()
+			data = append(data, []string{typ, abstract.Elem().String(), concrete.String()})
+		}
 	}
 
 	table := tablewriter.NewWriter(os.Stdout)
