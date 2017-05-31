@@ -111,5 +111,27 @@ When we need to put structure and method constructor
 	// we can use 
 	b.(*name).PrintHelloWorld()
 
+  You can put the structure
 
+    import  store "github.com/agoalofalife/storekeeper"
+
+    type Master struct {
+    	name string
+    }
+
+    func (master Master) GetName()  string{
+    	return master.nam e
+    }
+        
+	storage := store.New()
+	
+	storage.SetInstance(`Master`, Master{`Male name`})
+	
+	b := storage.Extract(`Master`)
+	
+	// display  Male name
+	b.(Master).GetName()
+	
+
+  
 
